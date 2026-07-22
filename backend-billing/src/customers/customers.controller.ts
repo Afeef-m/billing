@@ -1,0 +1,61 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
+import { CustomersService } from './customers.service';
+import { CreateCustomerDto } from './dto/create-customer.dto';
+import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { Query } from '@nestjs/common';
+
+@Controller('customers')
+export class CustomersController {
+  constructor(private readonly customersService: CustomersService) {}
+
+  @Post()
+  create(@Body() createCustomerDto: CreateCustomerDto) {
+    return this.customersService.create(createCustomerDto);
+  }
+
+  @Get()
+  findAll() {
+    return this.customersService.findAll();
+  }
+
+  @Get('search')
+  search(@Query('query') query: string) {
+    return this.customersService.search(query);
+  }
+
+  @Get('default')
+  getDefaultCustomer() {
+    return this.customersService.getDefaultCustomer();
+  }
+
+  @Get('phone/:phone')
+  findByPhone(@Param('phone') phone: string) {
+    return this.customersService.findByPhone(phone);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.customersService.findOne(+id);
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateCustomerDto: UpdateCustomerDto,
+  ) {
+    return this.customersService.update(+id, updateCustomerDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.customersService.remove(+id);
+  }
+}
