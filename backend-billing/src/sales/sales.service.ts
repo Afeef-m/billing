@@ -7,7 +7,6 @@ import {
 import { Prisma, SaleStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateSaleDto } from './dto/create-sale.dto';
-import { UpdateSaleDto } from './dto/update-sale.dto';
 import { AddSaleItemDto } from './dto/add-sale-item.dto';
 import { calculateSaleTotals } from './helpers/sale-total.helper';
 import { UpdateSaleItemDto } from './dto/update-sale-item.dto';
@@ -69,17 +68,34 @@ export class SalesService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} sale`;
+  async findOne(id: number) {
+    const sale = await this.prisma.sale.findUnique({
+      where: { id },
+      include: {
+        customer: true,
+        payment: true,
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
+
+    if (!sale) {
+      throw new NotFoundException('Sale not found');
+    }
+
+    return sale;
   }
 
-  update(id: number, updateSaleDto: UpdateSaleDto) {
-    return `This action updates a #${id} sale`;
-  }
+  // update(id: number, updateSaleDto: UpdateSaleDto) {
+  //   return `This action updates a #${id} sale`;
+  // }
 
-  remove(id: number) {
-    return `This action removes a #${id} sale`;
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} sale`;
+  // }
 
   async addItem(saleId: number, addSaleItemDto: AddSaleItemDto) {
     // 1. Find sale

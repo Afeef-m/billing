@@ -10,7 +10,6 @@ import {
 import { SalesService } from './sales.service';
 import { AddSaleItemDto } from './dto/add-sale-item.dto';
 import { CreateSaleDto } from './dto/create-sale.dto';
-import { UpdateSaleDto } from './dto/update-sale.dto';
 import { UpdateSaleItemDto } from './dto/update-sale-item.dto';
 import { UpdateSaleItemPriceDto } from './dto/update-sale-item-price.dto';
 import { UpdateSaleDiscountDto } from './dto/update-sale-discount.dto';
@@ -85,13 +84,13 @@ export class SalesController {
     return this.salesService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSaleDto: UpdateSaleDto) {
-    return this.salesService.update(+id, updateSaleDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateSaleDto: UpdateSaleDto) {
+  //   return this.salesService.update(+id, updateSaleDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.salesService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.salesService.remove(+id);
+  // }
 }
