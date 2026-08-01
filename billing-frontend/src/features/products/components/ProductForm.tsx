@@ -9,82 +9,72 @@ import PricingSection from "../sections/PricingSection";
 import InventorySection from "../sections/InventorySection";
 import NotesSection from "../sections/NotesSection";
 import { useCreateProduct } from "../hooks/useCreateProduct";
-import { useEffect } from "react";
 import { Product } from "../types/product";
+import { useUpdateProduct } from "../hooks/useUpdateProduct";
+import { toast } from "sonner";
 
 type ProductFormProps = {
   mode: "create" | "edit";
   product: Product | null;
 };
 
-export default function ProductForm({
-  mode,
-  product,
-}: ProductFormProps) {
-
+export default function ProductForm({ mode, product }: ProductFormProps) {
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
-    defaultValues: {
-      barcode: "",
-      name: "",
-      categoryId: 0,
-      brand: "",
-      unit: "",
-      purchasePrice: 0,
-      retailPrice: 0,
-      wholesalePrice: 0,
-      mrp: 0,
-      currentStock: 0,
-      notes: "",
-      isActive: true,
-    },
+    defaultValues:
+      mode === "edit" && product
+        ? {
+            barcode: product.barcode,
+            name: product.name,
+            categoryId: product.categoryId,
+            brand: product.brand ?? "",
+            unit: product.unit,
+            purchasePrice: Number(product.purchasePrice),
+            retailPrice: Number(product.retailPrice),
+            wholesalePrice: Number(product.wholesalePrice),
+            mrp: Number(product.mrp),
+            currentStock: product.currentStock,
+            notes: product.notes ?? "",
+            isActive: product.isActive,
+          }
+        : {
+            barcode: "",
+            name: "",
+            categoryId: 0,
+            brand: "",
+            unit: "",
+            purchasePrice: 0,
+            retailPrice: 0,
+            wholesalePrice: 0,
+            mrp: 0,
+            currentStock: 0,
+            notes: "",
+            isActive: true,
+          },
   });
-  useEffect(() => {
-  if (mode === "edit" && product) {
-    form.reset({
-      barcode: product.barcode,
-      name: product.name,
-      categoryId: product.categoryId,
-      brand: product.brand ?? "",
-      unit: product.unit,
-      purchasePrice: Number(product.purchasePrice),
-      retailPrice: Number(product.retailPrice),
-      wholesalePrice: Number(product.wholesalePrice),
-      mrp: Number(product.mrp),
-      currentStock: product.currentStock,
-      notes: product.notes ?? "",
-      isActive: product.isActive,
-    });
-  }
-
-  if (mode === "create") {
-    form.reset({
-      barcode: "",
-      name: "",
-      categoryId: 0,
-      brand: "",
-      unit: "",
-      purchasePrice: 0,
-      retailPrice: 0,
-      wholesalePrice: 0,
-      mrp: 0,
-      currentStock: 0,
-      notes: "",
-      isActive: true,
-    });
-  }
-}, [mode, product, form]);
   const createProductMutation = useCreateProduct();
+  const updateProductMutation = useUpdateProduct();
 
   const onSubmit = async (data: ProductFormValues) => {
     try {
-      await createProductMutation.mutateAsync(data);
+      if (mode === "create") {
+        await createProductMutation.mutateAsync(data);
 
-      console.log("Product created successfully");
+        toast.success("Product created successfully");
+      } else {
+        if (!product) return;
 
-      form.reset();
+        await updateProductMutation.mutateAsync({
+          id: product.id,
+          data,
+        });
+
+        toast.success("Product updated successfully");
+      }
+      // form.reset();
     } catch (error) {
       console.error(error);
+      toast.error("Failed to update product");
     }
   };
 
@@ -102,10 +92,8 @@ export default function ProductForm({
         <button type="button">Cancel</button>
 
         <button type="submit">
-  {mode === "create"
-    ? "Save Product"
-    : "Update Product"}
-</button>
+          {mode === "create" ? "Save Product" : "Update Product"}
+        </button>
       </div>
     </form>
   );

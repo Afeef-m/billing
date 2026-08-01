@@ -32,6 +32,7 @@ export default function ProductDialog({
         </DialogHeader>
 
         <ProductForm
+          key={product?.id ?? "create"}
           mode={mode}
           product={product}
         />

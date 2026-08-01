@@ -5,6 +5,7 @@ import { UseFormReturn } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { ProductFormValues } from "../schemas/product.schema";
 
 
 type NotesSectionProps = {

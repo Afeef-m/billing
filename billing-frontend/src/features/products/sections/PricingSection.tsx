@@ -5,8 +5,8 @@ import { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { ProductFormValues } from "../schemas/product.schema";
 
-import { ProductFormValues } from "../../schemas/product.schema";
 
 type PricingSectionProps = {
   form: UseFormReturn<ProductFormValues>;
