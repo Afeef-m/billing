@@ -12,6 +12,7 @@ import { useCreateProduct } from "../hooks/useCreateProduct";
 import { Product } from "../types/product";
 import { useUpdateProduct } from "../hooks/useUpdateProduct";
 import { toast } from "sonner";
+import axios from "axios";
 
 type ProductFormProps = {
   mode: "create" | "edit";
@@ -71,10 +72,12 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
 
         toast.success("Product updated successfully");
       }
-      // form.reset();
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to update product");
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || "Something went wrong");
+      } else {
+        toast.error("Something went wrong");
+      }
     }
   };
 

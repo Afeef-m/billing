@@ -136,6 +136,48 @@ export class ProductsService {
     });
   }
 
+  async restore(id: number) {
+    const product = await this.prisma.product.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    if (product.isActive) {
+      throw new ConflictException('Product is already active');
+    }
+
+    return this.prisma.product.update({
+      where: {
+        id,
+      },
+      data: {
+        isActive: true,
+      },
+      include: {
+        category: true,
+      },
+    });
+  }
+
+  async findInactive() {
+    return this.prisma.product.findMany({
+      where: {
+        isActive: false,
+      },
+      include: {
+        category: true,
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    });
+  }
+
   async findByBarcode(barcode: string) {
     const product = await this.prisma.product.findFirst({
       where: {

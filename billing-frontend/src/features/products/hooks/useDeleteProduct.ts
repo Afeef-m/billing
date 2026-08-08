@@ -1,26 +1,28 @@
+"use client";
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ProductFormValues } from "../schemas/product.schema";
-import { updateProduct } from "../services/products.service";
+import { deleteProduct } from "../services/products.service";
 
-type UpdateProductPayload = {
-  id: number;
-  data: ProductFormValues;
-};
-
-export function useUpdateProduct() {
+export function useDeleteProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: UpdateProductPayload) =>
-      updateProduct(id, data),
+    mutationFn: deleteProduct,
 
     onSuccess: () => {
+      // Active products
       queryClient.invalidateQueries({
         queryKey: ["products"],
       });
 
+      // Search results
       queryClient.invalidateQueries({
         queryKey: ["products", "search"],
+      });
+
+      // Inactive products
+      queryClient.invalidateQueries({
+        queryKey: ["products", "inactive"],
       });
     },
   });

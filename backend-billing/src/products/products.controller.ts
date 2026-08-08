@@ -26,6 +26,11 @@ export class ProductsController {
     return this.productsService.findAll();
   }
 
+  @Get('inactive')
+  findInactive() {
+    return this.productsService.findInactive();
+  }
+
   @Get('search')
   search(@Query('query') query: string) {
     return this.productsService.search(query);
@@ -38,6 +43,12 @@ export class ProductsController {
   findByBarcode(@Param('barcode') barcode: string) {
     return this.productsService.findByBarcode(barcode);
   }
+
+  @Patch(':id/restore')
+  restore(@Param('id') id: string) {
+    return this.productsService.restore(+id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(+id);
