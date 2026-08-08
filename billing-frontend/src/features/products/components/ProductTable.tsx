@@ -22,38 +22,40 @@ import EmptyState from "@/components/common/EmptyState";
 import { useProducts } from "../hooks/useProducts";
 import { useSearchProducts } from "../hooks/useSearchProducts";
 import { useInactiveProducts } from "../hooks/useInactiveProducts";
-import { useRestoreProduct } from "../hooks/useRestoreProduct";
-
 import React from "react";
 
 type ProductTableProps = {
   search: string;
   status: "active" | "inactive";
+  sort: string;
   onView: (product: Product) => void;
   onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
+  onRestore: (product: Product) => void;
 };
 
 export default function ProductTable({
   search,
   status,
+  sort,
   onView,
   onEdit,
   onDelete,
+  onRestore,
 }: ProductTableProps) {
-  const allProducts = useProducts();
+  
+  const activeProducts = useProducts(sort);
 
-  const searchedProducts = useSearchProducts(search);
+  const inactiveProducts = useInactiveProducts(sort);
 
-  const inactiveProducts = useInactiveProducts();
-
-  const restoreMutation = useRestoreProduct();
-
-  const activeProductsQuery =
-    search.trim() === "" ? allProducts : searchedProducts;
+  const searchedProducts = useSearchProducts(search, status);
 
   const productsQuery =
-    status === "active" ? activeProductsQuery : inactiveProducts;
+    search.trim() === ""
+      ? status === "active"
+        ? activeProducts
+        : inactiveProducts
+      : searchedProducts;
 
   const { data: products, isLoading, isError } = productsQuery;
 
@@ -74,18 +76,10 @@ export default function ProductTable({
     }
 
     clickTimer.current = setTimeout(() => {
-      console.log("Selected:", product);
+      onView(product);
 
       clickTimer.current = null;
     }, 250);
-  };
-
-  const handleRestore = async (product: Product) => {
-    try {
-      await restoreMutation.mutateAsync(product.id);
-    } catch (error) {
-      console.error("Failed to restore product", error);
-    }
   };
 
   if (isLoading) {
@@ -121,7 +115,7 @@ export default function ProductTable({
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border bg-background">
+    <div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
@@ -157,7 +151,7 @@ export default function ProductTable({
               onClick={() => handleRowClick(product)}
             >
               <TableCell className="font-mono text-xs">
-                {product.barcode}
+                {product.barcode ?? "-"}
               </TableCell>
 
               <TableCell>
@@ -170,17 +164,19 @@ export default function ProductTable({
                 </div>
               </TableCell>
 
-              <TableCell>{product.category.name}</TableCell>
+              <TableCell>{product.category?.name ?? "No Category"}</TableCell>
 
               <TableCell className="text-right">
-                ₹{product.wholesalePrice}
+                ₹{product.wholesalePrice ?? "-"}
               </TableCell>
 
               <TableCell className="text-right font-semibold">
                 ₹{product.retailPrice}
               </TableCell>
 
-              <TableCell className="text-right">₹{product.mrp}</TableCell>
+              <TableCell className="text-right">
+                ₹{product.mrp ?? "-"}
+              </TableCell>
 
               <TableCell className="text-right">
                 <Badge variant={product.isActive ? "default" : "secondary"}>
@@ -190,6 +186,7 @@ export default function ProductTable({
 
               <TableCell>
                 <div className="flex justify-center gap-1">
+                  {/* View */}
                   <Button
                     variant="ghost"
                     size="icon"
@@ -202,6 +199,7 @@ export default function ProductTable({
                     <Eye className="h-4 w-4" />
                   </Button>
 
+                  {/* Active actions */}
                   {status === "active" ? (
                     <>
                       <Button
@@ -232,11 +230,10 @@ export default function ProductTable({
                     <Button
                       variant="ghost"
                       size="icon"
-                      disabled={restoreMutation.isPending}
                       title="Restore product"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleRestore(product);
+                        onRestore(product);
                       }}
                     >
                       <RotateCcw className="h-4 w-4 text-green-600" />

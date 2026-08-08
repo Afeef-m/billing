@@ -9,17 +9,13 @@ export function useRestoreProduct() {
   return useMutation({
     mutationFn: (id: number) => restoreProduct(id),
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ["products"],
       });
 
-      queryClient.invalidateQueries({
-        queryKey: ["products", "search"],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ["inactive-products"],
+      await queryClient.invalidateQueries({
+        queryKey: ["products", "inactive"],
       });
     },
   });

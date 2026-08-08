@@ -11,24 +11,23 @@ export interface Product {
   id: number;
   barcode: string;
   name: string;
-  categoryId: number;
 
-  brand: string;
-  unit: string;
+  categoryId?: number | null;
+  category?: Category | null;
 
-  purchasePrice: string;
+  brand?: string | null;
+  unit?: string | null;
+
   retailPrice: string;
-  wholesalePrice: string;
-  mrp: string;
+  wholesalePrice?: string | null;
+  mrp?: string | null;
 
   currentStock: number;
 
-  notes: string;
+  notes?: string | null;
 
   isActive: boolean;
 
   createdAt: string;
   updatedAt: string;
-
-  category: Category;
 }

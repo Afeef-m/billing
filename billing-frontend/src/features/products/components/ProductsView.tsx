@@ -12,6 +12,8 @@ import DeleteProductDialog from "./DeleteProductDialog";
 
 import { Product } from "../types/product";
 import ProductDetailsDialog from "./ProductDetailsDialog";
+import { useRestoreProduct } from "../hooks/useRestoreProduct";
+import { toast } from "sonner";
 
 export default function ProductsView() {
   const [search, setSearch] = useState("");
@@ -27,6 +29,8 @@ export default function ProductsView() {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const [status, setStatus] = useState<"active" | "inactive">("active");
+
+  const [sort, setSort] = useState("name-asc");
 
   const handleEdit = (product: Product) => {
     setSelectedProduct(product);
@@ -48,6 +52,19 @@ export default function ProductsView() {
   const handleDelete = (product: Product) => {
     setSelectedProduct(product);
     setDeleteOpen(true);
+  };
+
+  const restoreMutation = useRestoreProduct();
+
+  const handleRestore = async (product: Product) => {
+    try {
+      await restoreMutation.mutateAsync(product.id);
+
+      toast.success("Product restored successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to restore product");
+    }
   };
 
   return (
@@ -75,14 +92,21 @@ export default function ProductsView() {
         </Button>
       </div>
 
-      <ProductToolbar search={search} onSearchChange={setSearch} />
+      <ProductToolbar
+        search={search}
+        onSearchChange={setSearch}
+        sort={sort}
+        onSortChange={setSort}
+      />
 
       <ProductTable
         search={search}
         status={status}
+        sort={sort}
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onRestore={handleRestore}
       />
 
       <ProductDialog

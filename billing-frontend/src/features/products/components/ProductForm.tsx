@@ -22,6 +22,7 @@ type ProductFormProps = {
 export default function ProductForm({ mode, product }: ProductFormProps) {
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
+
     defaultValues:
       mode === "edit" && product
         ? {
@@ -29,11 +30,13 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
             name: product.name,
             categoryId: product.categoryId,
             brand: product.brand ?? "",
-            unit: product.unit,
-            purchasePrice: Number(product.purchasePrice),
+            unit: product.unit ?? "",
             retailPrice: Number(product.retailPrice),
-            wholesalePrice: Number(product.wholesalePrice),
-            mrp: Number(product.mrp),
+            wholesalePrice:
+              product.wholesalePrice !== undefined
+                ? Number(product.wholesalePrice)
+                : undefined,
+            mrp: product.mrp !== undefined ? Number(product.mrp) : undefined,
             currentStock: product.currentStock,
             notes: product.notes ?? "",
             isActive: product.isActive,
@@ -41,13 +44,12 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
         : {
             barcode: "",
             name: "",
-            categoryId: 0,
+            categoryId: undefined,
             brand: "",
             unit: "",
-            purchasePrice: 0,
             retailPrice: 0,
-            wholesalePrice: 0,
-            mrp: 0,
+            wholesalePrice: undefined,
+            mrp: undefined,
             currentStock: 0,
             notes: "",
             isActive: true,

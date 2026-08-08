@@ -17,34 +17,36 @@ export class CreateProductDto {
   @IsNotEmpty()
   name!: string;
 
+  @IsOptional()
   @IsInt()
-  categoryId!: number;
+  categoryId?: number;
 
   @IsOptional()
   @IsString()
   brand?: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  unit!: string;
+  unit?: string;
 
   @IsNumber()
-  purchasePrice!: number;
-
-  @IsNumber()
+  @Min(0)
   retailPrice!: number;
 
   @IsOptional()
   @IsNumber()
+  @Min(0)
   wholesalePrice?: number;
 
   @IsOptional()
   @IsNumber()
+  @Min(0)
   mrp?: number;
 
+  @IsOptional()
   @IsInt()
   @Min(0)
-  currentStock!: number;
+  currentStock?: number;
 
   @IsOptional()
   @IsString()

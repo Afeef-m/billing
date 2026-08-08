@@ -20,6 +20,7 @@ import { ProductFormValues } from "../schemas/product.schema";
 
 type ProductInfoSectionProps = {
   form: UseFormReturn<ProductFormValues>;
+  mode: "create" | "edit";
 };
 
 export default function ProductInfoSection({ form }: ProductInfoSectionProps) {
@@ -34,14 +35,13 @@ export default function ProductInfoSection({ form }: ProductInfoSectionProps) {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {/* Barcode */}
-
         <div className="space-y-2">
           <Label htmlFor="barcode">Barcode</Label>
 
           <Input
             id="barcode"
-            placeholder="P000001"
+            placeholder="Automatically generated after saving"
+            readOnly
             {...form.register("barcode")}
           />
 
@@ -51,8 +51,6 @@ export default function ProductInfoSection({ form }: ProductInfoSectionProps) {
             </p>
           )}
         </div>
-
-        {/* Product Name */}
 
         <div className="space-y-2">
           <Label htmlFor="name">Product Name</Label>
@@ -66,8 +64,6 @@ export default function ProductInfoSection({ form }: ProductInfoSectionProps) {
           )}
         </div>
 
-        {/* Category */}
-
         <div className="space-y-2">
           <Label>Category</Label>
 
@@ -76,11 +72,13 @@ export default function ProductInfoSection({ form }: ProductInfoSectionProps) {
             name="categoryId"
             render={({ field }) => (
               <Select
-                value={field.value.toString()}
-                onValueChange={(value) => field.onChange(Number(value))}
+                value={field.value != null ? field.value.toString() : ""}
+                onValueChange={(value) => {
+                  field.onChange(value ? Number(value) : undefined);
+                }}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select Category" />
+                  <SelectValue placeholder="Select Category (Optional)" />
                 </SelectTrigger>
 
                 <SelectContent>
@@ -104,8 +102,6 @@ export default function ProductInfoSection({ form }: ProductInfoSectionProps) {
           )}
         </div>
 
-        {/* Brand */}
-
         <div className="space-y-2">
           <Label htmlFor="brand">Brand</Label>
 
@@ -115,8 +111,6 @@ export default function ProductInfoSection({ form }: ProductInfoSectionProps) {
             {...form.register("brand")}
           />
         </div>
-
-        {/* Unit */}
 
         <div className="space-y-2">
           <Label htmlFor="unit">Unit</Label>
@@ -129,8 +123,6 @@ export default function ProductInfoSection({ form }: ProductInfoSectionProps) {
             </p>
           )}
         </div>
-
-        {/* Status */}
 
         <div className="space-y-2">
           <Label>Status</Label>

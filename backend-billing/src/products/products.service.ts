@@ -11,50 +11,85 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ProductsService {
   constructor(private readonly prisma: PrismaService) {}
   async create(createProductDto: CreateProductDto) {
-    // Check duplicate barcode
-    if (createProductDto.barcode) {
-      const existingProduct = await this.prisma.product.findUnique({
-        where: {
-          barcode: createProductDto.barcode,
-        },
-      });
+    let barcode = createProductDto.barcode;
 
-      if (existingProduct) {
-        throw new ConflictException('Barcode already exists');
-      }
+    if (!barcode) {
+      const generated = await this.generateBarcode();
+      barcode = generated.barcode;
     }
-
-    // Check category exists
-    const category = await this.prisma.category.findUnique({
+    const existingProduct = await this.prisma.product.findUnique({
       where: {
-        id: createProductDto.categoryId,
+        barcode,
       },
     });
 
-    if (!category) {
-      throw new NotFoundException('Category not found');
+    if (existingProduct) {
+      throw new ConflictException('Barcode already exists');
     }
 
-    // Create product
+    if (createProductDto.categoryId) {
+      const category = await this.prisma.category.findUnique({
+        where: {
+          id: createProductDto.categoryId,
+        },
+      });
+
+      if (!category) {
+        throw new NotFoundException('Category not found');
+      }
+    }
+
     return this.prisma.product.create({
       data: {
-        barcode: createProductDto.barcode,
+        barcode,
         name: createProductDto.name,
         categoryId: createProductDto.categoryId,
         brand: createProductDto.brand,
         unit: createProductDto.unit,
-        purchasePrice: createProductDto.purchasePrice,
         retailPrice: createProductDto.retailPrice,
         wholesalePrice: createProductDto.wholesalePrice,
         mrp: createProductDto.mrp,
-        currentStock: createProductDto.currentStock,
+        currentStock: createProductDto.currentStock ?? 0,
         notes: createProductDto.notes,
         isActive: createProductDto.isActive ?? true,
       },
     });
   }
 
-  async findAll() {
+  async findAll(sort: string = 'name-asc') {
+    let orderBy: any = {
+      name: 'asc',
+    };
+
+    switch (sort) {
+      case 'name-asc':
+        orderBy = { name: 'asc' };
+        break;
+
+      case 'name-desc':
+        orderBy = { name: 'desc' };
+        break;
+
+      case 'newest':
+        orderBy = { createdAt: 'desc' };
+        break;
+
+      case 'oldest':
+        orderBy = { createdAt: 'asc' };
+        break;
+
+      case 'price-asc':
+        orderBy = { retailPrice: 'asc' };
+        break;
+
+      case 'price-desc':
+        orderBy = { retailPrice: 'desc' };
+        break;
+
+      default:
+        orderBy = { name: 'asc' };
+    }
+
     return this.prisma.product.findMany({
       where: {
         isActive: true,
@@ -62,9 +97,7 @@ export class ProductsService {
       include: {
         category: true,
       },
-      orderBy: {
-        name: 'asc',
-      },
+      orderBy,
     });
   }
 
@@ -137,6 +170,8 @@ export class ProductsService {
   }
 
   async restore(id: number) {
+    console.log('RESTORE CALLED:', id);
+
     const product = await this.prisma.product.findUnique({
       where: {
         id,
@@ -148,10 +183,11 @@ export class ProductsService {
     }
 
     if (product.isActive) {
+      console.log('ALREADY ACTIVE!');
       throw new ConflictException('Product is already active');
     }
 
-    return this.prisma.product.update({
+    const restoredProduct = await this.prisma.product.update({
       where: {
         id,
       },
@@ -162,9 +198,40 @@ export class ProductsService {
         category: true,
       },
     });
+    return restoredProduct;
   }
 
-  async findInactive() {
+  async findInactive(sort: string = 'name-asc') {
+    let orderBy: any = {
+      name: 'asc',
+    };
+
+    switch (sort) {
+      case 'name-asc':
+        orderBy = { name: 'asc' };
+        break;
+
+      case 'name-desc':
+        orderBy = { name: 'desc' };
+        break;
+
+      case 'newest':
+        orderBy = { createdAt: 'desc' };
+        break;
+
+      case 'oldest':
+        orderBy = { createdAt: 'asc' };
+        break;
+
+      case 'price-asc':
+        orderBy = { retailPrice: 'asc' };
+        break;
+
+      case 'price-desc':
+        orderBy = { retailPrice: 'desc' };
+        break;
+    }
+
     return this.prisma.product.findMany({
       where: {
         isActive: false,
@@ -172,9 +239,7 @@ export class ProductsService {
       include: {
         category: true,
       },
-      orderBy: {
-        name: 'asc',
-      },
+      orderBy,
     });
   }
 
@@ -196,21 +261,41 @@ export class ProductsService {
     return product;
   }
 
-  async search(query: string) {
+  async search(query: string, isActive: boolean = true) {
     return this.prisma.product.findMany({
       where: {
-        isActive: true,
-        name: {
-          contains: query,
-          mode: 'insensitive',
-        },
+        isActive,
+
+        OR: [
+          {
+            name: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+          {
+            barcode: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+          {
+            brand: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+        ],
       },
+
       include: {
         category: true,
       },
+
       orderBy: {
         name: 'asc',
       },
+
       take: 20,
     });
   }

@@ -5,15 +5,13 @@ export const productSchema = z.object({
 
   name: z.string().min(1, "Product name is required"),
 
-  categoryId: z.coerce.number().min(1, "Category is required"),
+  categoryId: z.coerce.number().optional(),
 
   brand: z.string().optional(),
 
-  unit: z.string().min(1, "Unit is required"),
+  unit: z.string().optional(),
 
-  purchasePrice: z.coerce.number(),
-
-  retailPrice: z.coerce.number(),
+  retailPrice: z.coerce.number().min(0),
 
   wholesalePrice: z.coerce.number().optional(),
 

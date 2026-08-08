@@ -6,11 +6,11 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { Query } from '@nestjs/common';
 
 @Controller('products')
 export class ProductsController {
@@ -22,19 +22,23 @@ export class ProductsController {
   }
 
   @Get()
-  findAll() {
-    return this.productsService.findAll();
+  findAll(@Query('sort') sort?: string) {
+    return this.productsService.findAll(sort);
   }
 
   @Get('inactive')
-  findInactive() {
-    return this.productsService.findInactive();
+  findInactive(@Query('sort') sort?: string) {
+    return this.productsService.findInactive(sort);
   }
 
   @Get('search')
-  search(@Query('query') query: string) {
-    return this.productsService.search(query);
+  search(
+    @Query('query') query: string,
+    @Query('status') status: 'active' | 'inactive' = 'active',
+  ) {
+    return this.productsService.search(query, status === 'active');
   }
+
   @Get('generate-barcode')
   generateBarcode() {
     return this.productsService.generateBarcode();

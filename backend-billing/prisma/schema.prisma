@@ -58,14 +58,12 @@ model Product {
 
   name String
 
-  categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int?
+  category   Category? @relation(fields: [categoryId], references: [id])
 
   brand String?
 
-  unit String
-
-  purchasePrice Decimal @db.Decimal(10, 2)
+  unit String?
 
   retailPrice Decimal @db.Decimal(10, 2)
 
