@@ -35,8 +35,9 @@ export class ProductsController {
   search(
     @Query('query') query: string,
     @Query('status') status: 'active' | 'inactive' = 'active',
+    @Query('sort') sort: string = 'name-asc',
   ) {
-    return this.productsService.search(query, status === 'active');
+    return this.productsService.search(query, status === 'active', sort);
   }
 
   @Get('generate-barcode')

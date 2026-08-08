@@ -5,11 +5,15 @@ import { searchProducts } from "../services/products.service";
 
 export function useSearchProducts(
   query: string,
-  status: "active" | "inactive"
+  status: "active" | "inactive",
+  sort: string = "name-asc"
 ) {
   return useQuery({
-    queryKey: ["products", "search", query, status],
-    queryFn: () => searchProducts(query, status),
+    queryKey: ["products", "search", query, status, sort],
+
+    queryFn: () =>
+      searchProducts(query, status, sort),
+
     enabled: query.trim().length > 0,
   });
 }

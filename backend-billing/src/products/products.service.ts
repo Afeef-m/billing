@@ -261,7 +261,37 @@ export class ProductsService {
     return product;
   }
 
-  async search(query: string, isActive: boolean = true) {
+  async search(query: string, isActive: boolean = true, sort = 'name-asc') {
+    let orderBy: any = {
+      name: 'asc',
+    };
+
+    switch (sort) {
+      case 'name-asc':
+        orderBy = { name: 'asc' };
+        break;
+
+      case 'name-desc':
+        orderBy = { name: 'desc' };
+        break;
+
+      case 'newest':
+        orderBy = { createdAt: 'desc' };
+        break;
+
+      case 'oldest':
+        orderBy = { createdAt: 'asc' };
+        break;
+
+      case 'price-asc':
+        orderBy = { retailPrice: 'asc' };
+        break;
+
+      case 'price-desc':
+        orderBy = { retailPrice: 'desc' };
+        break;
+    }
+
     return this.prisma.product.findMany({
       where: {
         isActive,
@@ -292,9 +322,7 @@ export class ProductsService {
         category: true,
       },
 
-      orderBy: {
-        name: 'asc',
-      },
+      orderBy,
 
       take: 20,
     });

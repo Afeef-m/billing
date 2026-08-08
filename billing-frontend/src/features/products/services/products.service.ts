@@ -17,9 +17,14 @@ export async function getProducts(
 export async function searchProducts(
   query: string,
   status: "active" | "inactive",
+  sort: string = "name-asc"
 ): Promise<Product[]> {
   const { data } = await api.get("/products/search", {
-    params: { query, status},
+    params: {
+      query,
+      status,
+      sort,
+    },
   });
 
   return data;

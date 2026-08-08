@@ -48,7 +48,11 @@ export default function ProductTable({
 
   const inactiveProducts = useInactiveProducts(sort);
 
-  const searchedProducts = useSearchProducts(search, status);
+  const searchedProducts = useSearchProducts(
+  search,
+  status,
+  sort
+);
 
   const productsQuery =
     search.trim() === ""
