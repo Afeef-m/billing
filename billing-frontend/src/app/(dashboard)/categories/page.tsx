@@ -1,3 +1,6 @@
-export default function Page() {
-  return <h1>Page Name</h1>;
+import CategoryView from "@/features/categories/components/CategoryView";
+
+export default function CategoryPage() {
+  return <CategoryView/>
+    
 }

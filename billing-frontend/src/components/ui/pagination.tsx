@@ -8,10 +8,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import {
-  ButtonProps,
-  buttonVariants,
-} from "@/components/ui/button";
+import { ButtonProps, buttonVariants,} from "@/components/ui/button";
 
 const Pagination = ({
   className,

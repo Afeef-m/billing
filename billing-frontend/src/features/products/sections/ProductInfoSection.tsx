@@ -15,8 +15,8 @@ import {
 
 import { Separator } from "@/components/ui/separator";
 
-import { useCategories } from "@/features/categories/hooks/useCategories";
 import { ProductFormValues } from "../schemas/product.schema";
+import { useCategoryOptions } from "@/features/categories/hooks/useCategoryOptions";
 
 type ProductInfoSectionProps = {
   form: UseFormReturn<ProductFormValues>;
@@ -24,7 +24,11 @@ type ProductInfoSectionProps = {
 };
 
 export default function ProductInfoSection({ form }: ProductInfoSectionProps) {
-  const { data: categories = [] } = useCategories();
+  const {
+  data: categories = [],
+  isLoading: categoriesLoading,
+} = useCategoryOptions();
+  
 
   return (
     <section className="space-y-4">

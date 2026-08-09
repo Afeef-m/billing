@@ -14,6 +14,7 @@ import { Product } from "../types/product";
 import ProductDetailsDialog from "./ProductDetailsDialog";
 import { useRestoreProduct } from "../hooks/useRestoreProduct";
 import { toast } from "sonner";
+import { Plus } from "lucide-react";
 
 export default function ProductsView() {
   const [search, setSearch] = useState("");
@@ -32,13 +33,11 @@ export default function ProductsView() {
 
   const [sort, setSort] = useState("name-asc");
   const [page, setPage] = useState(1);
-  const limit = 5;
-
+  const limit = 10;
 
   useEffect(() => {
-  setPage(1);
-}, [search, status, sort]);
-
+    setPage(1);
+  }, [search, status, sort]);
 
   const handleEdit = (product: Product) => {
     setSelectedProduct(product);
@@ -80,7 +79,12 @@ export default function ProductsView() {
       <PageHeader
         title="Products"
         description="Manage your products."
-        action={<Button onClick={handleCreate}>Add Product</Button>}
+        action={
+          <Button onClick={handleCreate}>
+            <Plus className="mr-2 size-4" />
+            Add Product
+          </Button>
+        }
       />
 
       {/* Active / Inactive */}
