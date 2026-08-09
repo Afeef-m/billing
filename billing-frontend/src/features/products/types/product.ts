@@ -31,3 +31,15 @@ export interface Product {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface ProductPaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface ProductListResponse {
+  data: Product[];
+  meta: ProductPaginationMeta;
+}

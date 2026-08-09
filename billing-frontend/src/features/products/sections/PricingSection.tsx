@@ -27,8 +27,6 @@ export default function PricingSection({
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 
-        {/* Retail Price */}
-
         <div className="space-y-2">
           <Label htmlFor="retailPrice">
             Retail Price
@@ -37,6 +35,8 @@ export default function PricingSection({
           <Input
             id="retailPrice"
             type="number"
+            step="0.01"
+            min="0"
             placeholder="0.00"
             {...form.register("retailPrice")}
           />
@@ -48,8 +48,6 @@ export default function PricingSection({
           )}
         </div>
 
-        {/* Wholesale Price */}
-
         <div className="space-y-2">
           <Label htmlFor="wholesalePrice">
             Wholesale Price
@@ -58,6 +56,8 @@ export default function PricingSection({
           <Input
             id="wholesalePrice"
             type="number"
+            step="0.01"
+            min="0"
             placeholder="0.00"
             {...form.register("wholesalePrice")}
           />
@@ -68,9 +68,6 @@ export default function PricingSection({
             </p>
           )}
         </div>
-
-        {/* MRP */}
-
         <div className="space-y-2">
           <Label htmlFor="mrp">
             MRP
@@ -79,6 +76,8 @@ export default function PricingSection({
           <Input
             id="mrp"
             type="number"
+            step="0.01"
+            min="0"
             placeholder="0.00"
             {...form.register("mrp")}
           />

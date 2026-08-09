@@ -2,13 +2,17 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/axios";
-import { Product } from "../types/product";
+import { Product, ProductListResponse } from "../types/product";
 
 async function getInactiveProducts(
+  page: number = 1,
+  limit: number = 20,
   sort: string = "name-asc"
-): Promise<Product[]> {
+): Promise<ProductListResponse> {
   const { data } = await api.get("/products/inactive", {
     params: {
+      page,
+      limit,
       sort,
     },
   });
@@ -16,9 +20,13 @@ async function getInactiveProducts(
   return data;
 }
 
-export function useInactiveProducts(sort: string = "name-asc") {
+export function useInactiveProducts(
+  page: number = 1,
+  limit: number = 20,
+  sort: string = "name-asc"
+) {
   return useQuery({
-    queryKey: ["products", "inactive", sort],
-    queryFn: () => getInactiveProducts(sort),
+    queryKey: ["products", "inactive", page, limit, sort],
+    queryFn: () => getInactiveProducts(page, limit, sort),
   });
 }

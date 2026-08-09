@@ -22,22 +22,38 @@ export class ProductsController {
   }
 
   @Get()
-  findAll(@Query('sort') sort?: string) {
-    return this.productsService.findAll(sort);
+  findAll(
+    @Query('page') page = '1',
+    @Query('limit') limit = '20',
+    @Query('sort') sort = 'name-asc',
+  ) {
+    return this.productsService.findAll(Number(page), Number(limit), sort);
   }
 
   @Get('inactive')
-  findInactive(@Query('sort') sort?: string) {
-    return this.productsService.findInactive(sort);
+  findInactive(
+    @Query('page') page = '1',
+    @Query('limit') limit = '20',
+    @Query('sort') sort = 'name-asc',
+  ) {
+    return this.productsService.findInactive(Number(page), Number(limit), sort);
   }
 
   @Get('search')
   search(
     @Query('query') query: string,
     @Query('status') status: 'active' | 'inactive' = 'active',
-    @Query('sort') sort: string = 'name-asc',
+    @Query('page') page = '1',
+    @Query('limit') limit = '20',
+    @Query('sort') sort = 'name-asc',
   ) {
-    return this.productsService.search(query, status === 'active', sort);
+    return this.productsService.search(
+      query,
+      status === 'active',
+      Number(page),
+      Number(limit),
+      sort,
+    );
   }
 
   @Get('generate-barcode')

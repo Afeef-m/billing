@@ -56,7 +56,9 @@ export class ProductsService {
     });
   }
 
-  async findAll(sort: string = 'name-asc') {
+  async findAll(page = 1, limit = 20, sort = 'name-asc') {
+    const skip = (page - 1) * limit;
+
     let orderBy: any = {
       name: 'asc',
     };
@@ -90,15 +92,35 @@ export class ProductsService {
         orderBy = { name: 'asc' };
     }
 
-    return this.prisma.product.findMany({
-      where: {
-        isActive: true,
+    const where = {
+      isActive: true,
+    };
+
+    const [products, total] = await Promise.all([
+      this.prisma.product.findMany({
+        where,
+        include: {
+          category: true,
+        },
+        orderBy,
+        skip,
+        take: limit,
+      }),
+
+      this.prisma.product.count({
+        where,
+      }),
+    ]);
+
+    return {
+      data: products,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
       },
-      include: {
-        category: true,
-      },
-      orderBy,
-    });
+    };
   }
 
   async findOne(id: number) {
@@ -201,7 +223,9 @@ export class ProductsService {
     return restoredProduct;
   }
 
-  async findInactive(sort: string = 'name-asc') {
+  async findInactive(page = 1, limit = 20, sort = 'name-asc') {
+    const skip = (page - 1) * limit;
+
     let orderBy: any = {
       name: 'asc',
     };
@@ -230,17 +254,40 @@ export class ProductsService {
       case 'price-desc':
         orderBy = { retailPrice: 'desc' };
         break;
+
+      default:
+        orderBy = { name: 'asc' };
     }
 
-    return this.prisma.product.findMany({
-      where: {
-        isActive: false,
+    const where = {
+      isActive: false,
+    };
+
+    const [products, total] = await Promise.all([
+      this.prisma.product.findMany({
+        where,
+        include: {
+          category: true,
+        },
+        orderBy,
+        skip,
+        take: limit,
+      }),
+
+      this.prisma.product.count({
+        where,
+      }),
+    ]);
+
+    return {
+      data: products,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
       },
-      include: {
-        category: true,
-      },
-      orderBy,
-    });
+    };
   }
 
   async findByBarcode(barcode: string) {
@@ -261,7 +308,15 @@ export class ProductsService {
     return product;
   }
 
-  async search(query: string, isActive: boolean = true, sort = 'name-asc') {
+  async search(
+    query: string,
+    isActive: boolean = true,
+    page = 1,
+    limit = 20,
+    sort = 'name-asc',
+  ) {
+    const skip = (page - 1) * limit;
+
     let orderBy: any = {
       name: 'asc',
     };
@@ -290,42 +345,61 @@ export class ProductsService {
       case 'price-desc':
         orderBy = { retailPrice: 'desc' };
         break;
+
+      default:
+        orderBy = { name: 'asc' };
     }
 
-    return this.prisma.product.findMany({
-      where: {
-        isActive,
+    const where = {
+      isActive,
 
-        OR: [
-          {
-            name: {
-              contains: query,
-              mode: 'insensitive',
-            },
+      OR: [
+        {
+          name: {
+            contains: query,
+            mode: 'insensitive' as const,
           },
-          {
-            barcode: {
-              contains: query,
-              mode: 'insensitive',
-            },
+        },
+        {
+          barcode: {
+            contains: query,
+            mode: 'insensitive' as const,
           },
-          {
-            brand: {
-              contains: query,
-              mode: 'insensitive',
-            },
+        },
+        {
+          brand: {
+            contains: query,
+            mode: 'insensitive' as const,
           },
-        ],
+        },
+      ],
+    };
+
+    const [products, total] = await Promise.all([
+      this.prisma.product.findMany({
+        where,
+        include: {
+          category: true,
+        },
+        orderBy,
+        skip,
+        take: limit,
+      }),
+
+      this.prisma.product.count({
+        where,
+      }),
+    ]);
+
+    return {
+      data: products,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
       },
-
-      include: {
-        category: true,
-      },
-
-      orderBy,
-
-      take: 20,
-    });
+    };
   }
   async generateBarcode() {
     const latestProduct = await this.prisma.product.findFirst({

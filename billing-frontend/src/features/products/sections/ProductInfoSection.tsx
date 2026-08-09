@@ -78,7 +78,13 @@ export default function ProductInfoSection({ form }: ProductInfoSectionProps) {
                 }}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select Category (Optional)" />
+                  <SelectValue placeholder="Select Category (Optional)">
+                    {field.value != null
+                      ? categories.find(
+                          (category) => category.id === field.value,
+                        )?.name
+                      : "Select Category (Optional)"}
+                  </SelectValue>
                 </SelectTrigger>
 
                 <SelectContent>

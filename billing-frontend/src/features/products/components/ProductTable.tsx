@@ -10,6 +10,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +36,11 @@ type ProductTableProps = {
   search: string;
   status: "active" | "inactive";
   sort: string;
+
+  page: number;
+  limit: number;
+  onPageChange: (page: number) => void;
+
   onView: (product: Product) => void;
   onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
@@ -38,21 +51,19 @@ export default function ProductTable({
   search,
   status,
   sort,
+  page,
+  limit,
+  onPageChange,
   onView,
   onEdit,
   onDelete,
   onRestore,
 }: ProductTableProps) {
-  
-  const activeProducts = useProducts(sort);
+  const activeProducts = useProducts(page, limit, sort);
 
-  const inactiveProducts = useInactiveProducts(sort);
+  const inactiveProducts = useInactiveProducts(page, limit, sort);
 
-  const searchedProducts = useSearchProducts(
-  search,
-  status,
-  sort
-);
+  const searchedProducts = useSearchProducts(search, status, page, limit, sort);
 
   const productsQuery =
     search.trim() === ""
@@ -61,7 +72,10 @@ export default function ProductTable({
         : inactiveProducts
       : searchedProducts;
 
-  const { data: products, isLoading, isError } = productsQuery;
+  const { data: response, isLoading, isError } = productsQuery;
+
+  const products = response?.data ?? [];
+  const meta = response?.meta;
 
   const clickTimer = React.useRef<NodeJS.Timeout | null>(null);
 
@@ -203,7 +217,6 @@ export default function ProductTable({
                     <Eye className="h-4 w-4" />
                   </Button>
 
-                  {/* Active actions */}
                   {status === "active" ? (
                     <>
                       <Button
@@ -249,6 +262,72 @@ export default function ProductTable({
           ))}
         </TableBody>
       </Table>
+
+      {meta && meta.totalPages > 1 && (
+  <div className="flex items-center justify-between border-t px-4 py-4">
+    <p className="text-sm text-muted-foreground">
+      Page {meta.page} of {meta.totalPages}
+    </p>
+
+    <Pagination className="w-auto">
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+
+              if (meta.page > 1) {
+                onPageChange(meta.page - 1);
+              }
+            }}
+            className={
+              meta.page === 1
+                ? "pointer-events-none opacity-50"
+                : ""
+            }
+          />
+        </PaginationItem>
+
+        {Array.from(
+          { length: meta.totalPages },
+          (_, index) => index + 1
+        ).map((pageNumber) => (
+          <PaginationItem key={pageNumber}>
+            <PaginationLink
+              href="#"
+              isActive={meta.page === pageNumber}
+              onClick={(e) => {
+                e.preventDefault();
+                onPageChange(pageNumber);
+              }}
+            >
+              {pageNumber}
+            </PaginationLink>
+          </PaginationItem>
+        ))}
+
+        <PaginationItem>
+          <PaginationNext
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+
+              if (meta.page < meta.totalPages) {
+                onPageChange(meta.page + 1);
+              }
+            }}
+            className={
+              meta.page === meta.totalPages
+                ? "pointer-events-none opacity-50"
+                : ""
+            }
+          />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  </div>
+)}
     </div>
   );
 }

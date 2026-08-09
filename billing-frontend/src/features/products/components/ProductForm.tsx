@@ -13,6 +13,8 @@ import { Product } from "../types/product";
 import { useUpdateProduct } from "../hooks/useUpdateProduct";
 import { toast } from "sonner";
 import axios from "axios";
+import { Button } from "@/components/ui/button";
+import { X, Save } from "lucide-react";
 
 type ProductFormProps = {
   mode: "create" | "edit";
@@ -26,17 +28,17 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
     defaultValues:
       mode === "edit" && product
         ? {
-            barcode: product.barcode,
+            barcode: product.barcode ?? "",
             name: product.name,
-            categoryId: product.categoryId,
+            categoryId: product.categoryId ?? undefined,
             brand: product.brand ?? "",
             unit: product.unit ?? "",
             retailPrice: Number(product.retailPrice),
             wholesalePrice:
-              product.wholesalePrice !== undefined
+              product.wholesalePrice != null
                 ? Number(product.wholesalePrice)
                 : undefined,
-            mrp: product.mrp !== undefined ? Number(product.mrp) : undefined,
+            mrp: product.mrp != null ? Number(product.mrp) : undefined,
             currentStock: product.currentStock,
             notes: product.notes ?? "",
             isActive: product.isActive,
@@ -89,16 +91,21 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
 
       <PricingSection form={form} />
 
-      <InventorySection form={form} />
+      {/* <InventorySection form={form} /> */}
 
-      <NotesSection form={form} />
+      {/* <NotesSection form={form} /> */}
 
-      <div className="flex justify-end gap-3">
-        <button type="button">Cancel</button>
+      <div className="sticky bottom-0 z-10 flex justify-end gap-2 border-t bg-background py-4">
+        <Button type="button" variant="outline" className="gap-2">
+          <X className="h-4 w-4" />
+          Cancel
+        </Button>
 
-        <button type="submit">
+        <Button type="submit" className="gap-2">
+          <Save className="h-4 w-4" />
+
           {mode === "create" ? "Save Product" : "Update Product"}
-        </button>
+        </Button>
       </div>
     </form>
   );

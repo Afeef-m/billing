@@ -1,12 +1,16 @@
 import { api } from "@/lib/axios";
-import { Product } from "../types/product";
+import { Product, ProductListResponse } from "../types/product";
 import { ProductFormValues } from "../schemas/product.schema";
 
 export async function getProducts(
+  page: number = 1,
+  limit: number = 20,
   sort: string = "name-asc"
-): Promise<Product[]> {
+): Promise<ProductListResponse> {
   const { data } = await api.get("/products", {
     params: {
+      page,
+      limit,
       sort,
     },
   });
@@ -17,12 +21,16 @@ export async function getProducts(
 export async function searchProducts(
   query: string,
   status: "active" | "inactive",
+  page: number = 1,
+  limit: number = 20,
   sort: string = "name-asc"
-): Promise<Product[]> {
+): Promise<ProductListResponse> {
   const { data } = await api.get("/products/search", {
     params: {
       query,
       status,
+      page,
+      limit,
       sort,
     },
   });

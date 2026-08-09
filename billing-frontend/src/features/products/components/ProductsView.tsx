@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import PageContainer from "@/components/common/PageContainer";
@@ -31,6 +31,14 @@ export default function ProductsView() {
   const [status, setStatus] = useState<"active" | "inactive">("active");
 
   const [sort, setSort] = useState("name-asc");
+  const [page, setPage] = useState(1);
+  const limit = 5;
+
+
+  useEffect(() => {
+  setPage(1);
+}, [search, status, sort]);
+
 
   const handleEdit = (product: Product) => {
     setSelectedProduct(product);
@@ -103,6 +111,9 @@ export default function ProductsView() {
         search={search}
         status={status}
         sort={sort}
+        page={page}
+        limit={limit}
+        onPageChange={setPage}
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}

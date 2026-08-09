@@ -24,18 +24,28 @@ export default function ProductDialog({
 }: ProductDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl">
-        <DialogHeader>
-          <DialogTitle>
+      <DialogContent
+        className="
+          flex
+          max-h-[90vh]
+          flex-col
+          overflow-hidden
+          sm:max-w-4xl
+        "
+      >
+        <DialogHeader className="shrink-0">
+          <DialogTitle className="text-xl font-semibold">
             {mode === "create" ? "Add Product" : "Edit Product"}
           </DialogTitle>
         </DialogHeader>
 
-        <ProductForm
-          key={product?.id ?? "create"}
-          mode={mode}
-          product={product}
-        />
+        <div className="min-h-0 flex-1 overflow-y-auto pr-2">
+          <ProductForm
+            key={product?.id ?? "create"}
+            mode={mode}
+            product={product}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );
